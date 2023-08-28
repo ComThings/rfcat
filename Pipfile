@@ -1,0 +1,17 @@
+[[source]]
+url = "https://pypi.org/simple"
+verify_ssl = true
+name = "pypi"
+
+[packages]
+pyusb = "==1.2.1"
+future = "==0.18.3"
+ipython = "==8.10.0"
+pyserial = "==3.5"
+numpy = "==1.25.2"
+requests = "==2.31.0"
+pyside2 = "==5.15.2.1"
+rfcat = {editable = true, path = "."}
+
+[requires]
+python_full_version = "3.9.10"
