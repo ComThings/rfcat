@@ -19,7 +19,7 @@ import select
 import threading
 from binascii import hexlify
 
-from rflib.const_gollum import PANDWARF_PRODUCT_ID, PANDWARF_ROGUE_PRODUCT_ID
+from rflib.const_gollum import PANDWARF_V3_PRODUCT_ID, PANDWARF_V3_ROGUE_PRODUCT_ID, PANDWARF_V4_ROGUE_PRODUCT_ID, PANDWARF_V4_PRODUCT_ID
 
 from . import bits
 from .bits import correctbytes, ord23
@@ -44,15 +44,13 @@ def getRfCatDevices():
         for dev in bus.devices:
             # OpenMoko assigned or Legacy TI
             if (dev.idVendor == 0x0451 and dev.idProduct == 0x4715) or \
-                (dev.idVendor == 0x1d50 and (dev.idProduct == 0x6047 or 
-                                             dev.idProduct == 0x6048 or 
-                                             dev.idProduct == 0x605b or
-                                             dev.idProduct == 0xecc1 or
-                                             dev.idProduct == PANDWARF_PRODUCT_ID or 
-                                             dev.idProduct == PANDWARF_ROGUE_PRODUCT_ID)):
+                    (dev.idVendor == 0x1d50 and (dev.idProduct in [0x6047, 0x6048, 0x605b, 0xecc1] or
+                                                 dev.idProduct in [PANDWARF_V3_PRODUCT_ID, PANDWARF_V4_PRODUCT_ID] or
+                                                 dev.idProduct in [PANDWARF_V3_ROGUE_PRODUCT_ID, PANDWARF_V4_ROGUE_PRODUCT_ID]
+                    )):
                 rfcats.append(dev)
 
-            elif (dev.idVendor == 0x1d50 and (dev.idProduct == 0x6049 or dev.idProduct == 0x604a or dev.idProduct == 0xecc0)):
+            elif (dev.idVendor == 0x1d50 and (dev.idProduct in [0x6049, 0x604a, 0xecc0])):
                 print("Already in Bootloader Mode... exiting")
                 exit(0)
 
