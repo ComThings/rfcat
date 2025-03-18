@@ -8,7 +8,7 @@ from rflib.ccspecan import SPECAN_QUEUE
 from .utils_gollum import Tools
 
 from .chipcon_usb import ChipconUsbTimeoutException, keystop
-from .chipcondefs import RFST_SIDLE
+from .chipcondefs import RFST_SIDLE, DEVIATN
 from .const import MOD_ASK_OOK, SYNCM_CARRIER, USB_RX_WAIT, USB_TX_WAIT
 from .const_gollum import *
 
@@ -193,6 +193,13 @@ class PandwaRF(RfCat):
         _data = struct.pack("BB", invert, modulation)
         return self._sendAppRf(CMD_RF_SET_MODULATION, _data)
 
+    def _sendRfSetDeviation(self, deviation: int):
+        # Add new key: value for deviation: DEVIATN register
+        DEVIATIONS = {9521: 0x25, 14649: 0x32, 20508: 0x36}
+        reg_value = DEVIATIONS.get(deviation, 0)
+        if reg_value:
+            self.poke8(DEVIATN, reg_value)
+
     def _sendRfSetDatarate(self, datarate: int):
         _data = struct.pack("<I", datarate)
         return self._sendAppRf(CMD_RF_SET_DATARATE, _data)
@@ -375,6 +382,15 @@ class PandwaRF(RfCat):
         :return:
         """
         self._sendRfSetModulation(invert, modulation)
+
+    def setDeviation(self, deviation: int) -> None:
+        """
+        Modify Deviation in Hz.
+
+        :param deviation: Deviation in Hz
+        :return:
+        """
+        self._sendRfSetDeviation(deviation)
 
     def setMdmDRate(self, datarate: int) -> None:
         """

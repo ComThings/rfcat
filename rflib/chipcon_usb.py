@@ -109,7 +109,7 @@ class USBDongle(object):
         self.xmit_event.clear()
         self.reset_event.clear()
         self.trash = []
-   
+
     def setRFparameters(self):
         pass
 
@@ -168,7 +168,7 @@ class USBDongle(object):
 
         # claim that interface!
         do = dongles[self.idx][2]
-        
+
         try:
             do.claimInterface(0)
         except Exception as e:
@@ -222,7 +222,7 @@ class USBDongle(object):
 
     def resetup(self, console=True, copyDongle=None):
         self._do=None
-        if self._bootloader: 
+        if self._bootloader:
             return
         if self._debug: print(("waiting (resetup) %x" % self.idx), file=sys.stderr)
 
@@ -280,7 +280,7 @@ class USBDongle(object):
                 self.xmit_event.set()
                 self.xsema.release()
                 if self._debug: print(repr(self.xmit_queue), file=sys.stderr)
-        
+
     def _recvEP5(self, timeout=100):
         retary = [b"%c"%x for x in self._do.bulkRead(0x85, 500, timeout)]
         if self._debug: print("RECV:"+repr(retary), file=sys.stderr)
@@ -324,7 +324,7 @@ class USBDongle(object):
                     msg = self.xmit_queue.pop(0)
                     if not len(self.xmit_queue): # if there was only one message
                         self.xmit_event.clear() # clear the queue, within the lock
-                    
+
                     self.xsema.release()
 
                     self._sendEP5(msg)
@@ -457,7 +457,7 @@ class USBDongle(object):
                             if self._debug: print(("runEP5(): idx>0?"), file=sys.stderr)
                             self.trash.append(self.recv_queue[:idx])
                             self.recv_queue = self.recv_queue[idx:]
-                   
+
                         # recv_queue is vulnerable here, but it's ok because we only modify it earlier in this same thread
                         # DON'T CHANGE recv_queue from other threads!
                         msg = self.recv_queue
@@ -488,7 +488,7 @@ class USBDongle(object):
                                         sys.excepthook(*sys.exc_info())
                                     finally:
                                         self.rsema.release()                            # THREAD SAFETY DANCE COMPLETE
-                               
+
                                 q = b.get(cmd)
 
                                 if self.rsema.acquire():                            # THREAD SAFETY DANCE
@@ -507,8 +507,8 @@ class USBDongle(object):
                                         sys.excepthook(*sys.exc_info())
                                     finally:
                                         self.rsema.release()                            # THREAD SAFETY DANCE COMPLETE
-                               
-                            else:            
+
+                            else:
                                 if self._debug>1:     sys.stderr.write('=')
 
                             msg = self.recv_queue
@@ -595,7 +595,7 @@ class USBDongle(object):
                         retval = b.get(cmd)
                         b[cmd]=[]
                         if len(retval):
-                            retval = [ (d[4:],t) for d,t in retval ] 
+                            retval = [ (d[4:],t) for d,t in retval ]
                     except:
                         sys.excepthook(*sys.exc_info())
                     finally:
@@ -722,7 +722,7 @@ class USBDongle(object):
         start = time.time()
         for x in range(count):
             istart = time.time()
-            
+
             try:
                 r = self.send(APP_SYSTEM, SYS_CMD_PING, buf, wait)
                 r,rt = r
@@ -750,13 +750,13 @@ class USBDongle(object):
             r = self.send(APP_SYSTEM, SYS_CMD_BOOTLOADER, b"", wait=1)
         except ChipconUsbTimeoutException:
             pass
-        
+
     def RESET(self):
         try:
             r = self.send(APP_SYSTEM, SYS_CMD_RESET, b"RESET_NOW\x00")
         except ChipconUsbTimeoutException:
             pass
-        
+
     def peek(self, addr, bytecount=1):
         r, t = self.send(APP_SYSTEM, SYS_CMD_PEEK, struct.pack("<HH", bytecount, addr))
         return r
@@ -764,15 +764,15 @@ class USBDongle(object):
     def poke(self, addr, data):
         r, t = self.send(APP_SYSTEM, SYS_CMD_POKE, struct.pack("<H", addr) + data)
         return r
-    
+
     def poke8(self, addr, data):
         data = b'%c' % (data)
         return self.poke(addr, data)
-    
+
     def poke16(self, addr, data):
         data = struct.pack('<H', data)
         return self.poke(addr, data)
-    
+
     def pokeReg(self, addr, data):
         r, t = self.send(APP_SYSTEM, SYS_CMD_POKE_REG, struct.pack("<H", addr) + data)
         return r
@@ -780,7 +780,7 @@ class USBDongle(object):
     def getBuildInfo(self):
         r, t = self.send(APP_SYSTEM, SYS_CMD_BUILDTYPE, b'')
         return r
-            
+
     def getCompilerInfo(self):
         r, t = self.send(APP_SYSTEM, SYS_CMD_COMPILER, b'')
         return r
@@ -788,7 +788,7 @@ class USBDongle(object):
     def getDeviceSerialNumber(self):
         r, t = self.send(APP_SYSTEM, SYS_CMD_DEVICE_SERIAL_NUMBER, b'')
         return r
-            
+
     def getInterruptRegisters(self):
         regs = {}
         # IEN0,1,2
@@ -866,15 +866,15 @@ class USBDongle(object):
 def unittest(self, mhz=24):
     print("\nTesting USB ping()")
     self.ping(3)
-    
+
     print("\nTesting USB ep0Ping()")
     self.ep0Ping()
-    
+
     print("\nTesting USB enumeration")
     print("getString(1,100): %s" % repr(self._do.getString(1,100)))
     print("getString(2,100): %s" % repr(self._do.getString(2,100)))
     print("getString(3,100): %s" % repr(self._do.getString(3,100)))
-    
+
     print("\nTesting USB EP MAX_PACKET_SIZE handling (ep0Peek(0xf000, 100))")
     print(repr(self.ep0Peek(0xf000, 100)))
 
